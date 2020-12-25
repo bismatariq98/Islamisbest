@@ -1,0 +1,88 @@
+import 'package:dzemaat/main.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
+
+import 'package:fluttertoast/fluttertoast.dart';
+
+class LocationScreen extends StatefulWidget {
+  @override
+  _LocationScreenState createState() => _LocationScreenState();
+}
+
+class _LocationScreenState extends State<LocationScreen> {
+  TextEditingController locationController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  bool buscando = false;
+  String header = "";
+  bool permission = false;
+  var userName;
+  var phone;
+  var email;
+  var userAddress;
+  var userLatLong;
+  double distance;
+  bool deliveryAvailable = false;
+  @override
+  void initState() {
+    _getCurrentLocation();
+    super.initState();
+  }
+
+  String status = "";
+  void _getCurrentLocation() async {
+    GeolocationStatus geolocationStatus =
+        await Geolocator().checkGeolocationPermissionStatus();
+    status = geolocationStatus.toString();
+
+    void showToast(message) {
+      Fluttertoast.showToast(
+          msg: message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black54,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+
+    switch (geolocationStatus) {
+      case GeolocationStatus.denied:
+        showToast("Please On GPS for positioning");
+        break;
+      case GeolocationStatus.disabled:
+        showToast("Please On GPS for positioning");
+        break;
+      case GeolocationStatus.restricted:
+        showToast("Please On GPS for positioning");
+
+        break;
+      case GeolocationStatus.unknown:
+        showToast("Please On GPS for positioning");
+        break;
+      case GeolocationStatus.granted:
+        getUserLocation();
+    }
+  }
+
+  void getUserLocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemark = await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+
+    /*double distanceInMeters = await Geolocator().distanceBetween(position.latitude,position.longitude, 10.972062, 77.027841);
+    showToast(distanceInMeters);*/
+    locationController.text = placemark[0].name;
+    print(locationController.text);
+
+    setState(() {
+      permission = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
